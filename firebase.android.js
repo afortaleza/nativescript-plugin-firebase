@@ -211,6 +211,28 @@ firebase.addValueEventListener = function (updateCallback, path) {
   });
 };
 
+firebase.addListenerForSingleValueEvent = function (updateCallback, path) {
+  return new Promise(function (resolve, reject) {
+    try {
+      var listener = new com.firebase.client.ValueEventListener({
+        onDataChange: function(snapshot) {
+          updateCallback(firebase.getCallbackData('ValueChanged', snapshot));
+        },
+        onCancelled: function (firebaseError) {
+          updateCallback({
+            error: firebaseError.getMessage()
+          });
+        }
+      });
+      instance.child(path).addListenerForSingleValueEvent(listener);
+      resolve();
+    } catch (ex) {
+      console.log("Error in firebase.addListenerForSingleValueEvent: " + ex);
+      reject(ex);
+    }
+  });
+}
+
 firebase.removeEventListener = function (listener, path) {
   return new Promise(function (resolve, reject) {
     try {
